@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h1>📋 My Reports</h1>
+
+        <p>
+            View and track the waste reports submitted by you.
+        </p>
+    </div>
+
+
+    {% if reports %}
+
+        <div class="reports-grid">
+
+            {% for report in reports %}
+
+            <div class="report-card">
+
+                {% if report["image"] %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename='uploads/' + report['image']
+                        ) }}"
+                        class="report-image"
+                        alt="Waste Image"
+                    >
+
+                {% endif %}
+
+
+                <div class="report-content">
+
+                    <div class="report-top">
+
+                        <h2>
+                            {{ report["category"] }}
+                        </h2>
+
+                        <span
+                            class="status
+                            {% if report['status'] == 'Pending' %}
+                                status-pending
+                            {% elif report['status'] == 'In Progress' %}
+                                status-progress
+                            {% elif report['status'] == 'Collected' %}
+                                status-collected
+                            {% endif %}"
+                        >
+                            {{ report["status"] }}
+                        </span>
+
+                    </div>
+
+
+                    <p class="report-description">
+                        {{ report["description"] }}
+                    </p>
+
+
+                    <div class="report-info">
+
+                        <p>
+                            📍
+                            <strong>Location:</strong>
+                            {{ report["location"] }}
+                        </p>
+
+                        <p>
+                            🕒
+                            <strong>Submitted:</strong>
+                            {{ report["created_at"] }}
+                        </p>
+
+                    </div>
+
+
+                    {% if report["latitude"] and report["longitude"] %}
+
+                    <a
+                        href="https://www.google.com/maps?q={{ report['latitude'] }},{{ report['longitude'] }}"
+                        target="_blank"
+                        class="map-button"
+                    >
+                        🗺️ Open Location
+                    </a>
+
+                    {% endif %}
+
+
+                    {% if report["collector_name"] %}
+
+                    <div class="collection-info">
+
+                        <h3>🚛 Collection Details</h3>
+
+                        <p>
+                            <strong>Collector:</strong>
+                            {{ report["collector_name"] }}
+                        </p>
+
+                        <p>
+                            <strong>Date:</strong>
+                            {{ report["pickup_date"] }}
+                        </p>
+
+                        <p>
+                            <strong>Time:</strong>
+                            {{ report["pickup_time"] }}
+                        </p>
+
+                        {% if report["collection_notes"] %}
+
+                        <p>
+                            <strong>Notes:</strong>
+                            {{ report["collection_notes"] }}
+                        </p>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="no-reports">
+
+            <div class="no-reports-icon">
+                🗑️
+            </div>
+
+            <h2>No Reports Yet</h2>
+
+            <p>
+                You haven't submitted any waste reports yet.
+            </p>
+
+            <a
+                href="{{ url_for('report_waste') }}"
+                class="report-button"
+            >
+                📝 Report Waste
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

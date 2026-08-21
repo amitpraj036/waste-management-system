@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="auth-container">
+
+    <div class="auth-box">
+
+        <div class="auth-icon">
+            🔐
+        </div>
+
+        <h1>Welcome Back!</h1>
+
+        <p>Login to manage your waste reports</p>
+
+        <form method="POST">
+
+            <label>
+                📧 Email Address
+            </label>
+
+            <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+            >
+
+            <label>
+                🔑 Password
+            </label>
+
+            <input
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+            >
+
+            <button type="submit">
+                🔐 Login
+            </button>
+
+        </form>
+
+        <p class="auth-link">
+            New to Waste Management?
+            <a href="{{ url_for('register') }}">
+                Create Account
+            </a>
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

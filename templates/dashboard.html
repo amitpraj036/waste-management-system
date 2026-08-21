@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard - WasteCare
+{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-section">
+
+    <div class="dashboard-container">
+
+        <div class="dashboard-header">
+
+            <p class="tagline">
+                ♻️ Waste Management Analytics
+            </p>
+
+            <h1>
+                Admin Dashboard
+            </h1>
+
+            <p>
+                Monitor waste reports and collection progress.
+            </p>
+
+        </div>
+
+
+        <!-- Statistics -->
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    📋
+                </div>
+
+                <h2>
+                    {{ total_reports }}
+                </h2>
+
+                <p>
+                    Total Reports
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ⏳
+                </div>
+
+                <h2>
+                    {{ pending_reports }}
+                </h2>
+
+                <p>
+                    Pending
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    🚛
+                </div>
+
+                <h2>
+                    {{ progress_reports }}
+                </h2>
+
+                <p>
+                    In Progress
+                </p>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    ✅
+                </div>
+
+                <h2>
+                    {{ collected_reports }}
+                </h2>
+
+                <p>
+                    Collected
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- Category Statistics -->
+
+        <div class="category-section">
+
+            <h2>
+                Waste by Category
+            </h2>
+
+            {% if category_data %}
+
+                {% for item in category_data %}
+
+                <div class="category-row">
+
+                    <span>
+                        {{ item["category"] }}
+                    </span>
+
+                    <strong>
+                        {{ item["count"] }}
+                    </strong>
+
+                </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <p>
+                    No waste reports available yet.
+                </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Dashboard Buttons -->
+
+        <div class="dashboard-actions">
+
+            <a
+                href="/report"
+                class="primary-btn"
+            >
+                ➕ Report Waste
+            </a>
+
+            <a
+                href="/reports"
+                class="secondary-btn"
+            >
+                📋 View All Reports
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="access-container">
+
+    <div class="access-card">
+
+        <div class="access-icon">
+            🔒
+        </div>
+
+        <h1>Access Restricted</h1>
+
+        <p>
+            This section is available only to authorized
+            administrators.
+        </p>
+
+        <div class="access-info">
+            <span>👤</span>
+            <div>
+                <strong>Admin Access Required</strong>
+                <small>
+                    Please login with an administrator account
+                    to continue.
+                </small>
+            </div>
+        </div>
+
+        <div class="access-buttons">
+
+            <a href="{{ url_for('home') }}" class="home-btn">
+                🏠 Go Home
+            </a>
+
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                🔐 Switch Account
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
