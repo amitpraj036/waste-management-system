@@ -29,6 +29,7 @@ def init_db():
             pickup_date TEXT,
             pickup_time TEXT,
             collection_notes TEXT,
+            user_id INTEGER,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
@@ -41,9 +42,12 @@ def init_db():
             email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
             role TEXT DEFAULT 'user',
+            reset_token TEXT,
+            reset_token_expiry TIMESTAMP,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+
     # Notifications table
     conn.execute("""
         CREATE TABLE IF NOT EXISTS notifications (
@@ -56,7 +60,7 @@ def init_db():
         )
     """)
 
-    # Check existing columns
+    # Check existing waste_reports columns
     columns = conn.execute(
         "PRAGMA table_info(waste_reports)"
     ).fetchall()
@@ -66,7 +70,6 @@ def init_db():
         for column in columns
     ]
 
-    # Add missing columns
     new_columns = {
         "latitude": "REAL",
         "longitude": "REAL",
@@ -83,6 +86,29 @@ def init_db():
 
             conn.execute(
                 f"ALTER TABLE waste_reports ADD COLUMN {column} {data_type}"
+            )
+
+    # Check existing users columns
+    user_columns = conn.execute(
+        "PRAGMA table_info(users)"
+    ).fetchall()
+
+    user_column_names = [
+        column["name"]
+        for column in user_columns
+    ]
+
+    user_new_columns = {
+        "reset_token": "TEXT",
+        "reset_token_expiry": "TIMESTAMP"
+    }
+
+    for column, data_type in user_new_columns.items():
+
+        if column not in user_column_names:
+
+            conn.execute(
+                f"ALTER TABLE users ADD COLUMN {column} {data_type}"
             )
 
     conn.commit()

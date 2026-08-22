@@ -1,9 +1,58 @@
+import os
+import secrets
+import smtplib
+from email.message import EmailMessage
+from datetime import datetime, timedelta
+
 from flask import Flask, render_template, request, redirect, url_for, session
 from database import get_db_connection, init_db
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
+def send_reset_email(recipient, reset_link):
 
+    sender_email = os.environ.get("MAIL_EMAIL")
+    sender_password = os.environ.get("MAIL_PASSWORD")
+
+    if not sender_email or not sender_password:
+        raise RuntimeError(
+            "MAIL_EMAIL or MAIL_PASSWORD is not configured."
+        )
+
+    message = EmailMessage()
+
+    message["Subject"] = "Waste Management - Password Reset"
+    message["From"] = sender_email
+    message["To"] = recipient
+
+    message.set_content(
+        f"""
+Hello,
+
+We received a request to reset your Waste Management account password.
+
+Click the link below to reset your password:
+
+{reset_link}
+
+This link will expire in 30 minutes.
+
+If you did not request a password reset, you can safely ignore this email.
+
+Regards,
+Waste Management System
+"""
+    )
+
+    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+
+        server.starttls()
+
+        server.login(
+            sender_email,
+            sender_password
+        )
+
+        server.send_message(message)
 
 app = Flask(__name__)
 
@@ -109,6 +158,186 @@ def login():
 
     return render_template("login.html")
 
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+
+    if request.method == "POST":
+
+        email = request.form["email"]
+
+        conn = get_db_connection()
+
+        user = conn.execute(
+            """
+            SELECT id
+            FROM users
+            WHERE email = ?
+            """,
+            (email,)
+        ).fetchone()
+
+        if user:
+
+            reset_token = secrets.token_urlsafe(32)
+
+            expiry = datetime.now() + timedelta(minutes=30)
+
+            conn.execute(
+                """
+                UPDATE users
+                SET
+                    reset_token = ?,
+                    reset_token_expiry = ?
+                WHERE email = ?
+                """,
+                (
+                    reset_token,
+                    expiry,
+                    email
+                )
+            )
+
+            conn.commit()
+
+            conn.close()
+
+            return redirect(
+                url_for(
+                    "reset_password",
+                    token=reset_token
+                )
+            )
+
+        conn.close()
+
+        return "No account found with this email."
+
+    return render_template("forgot_password.html")
+
+
+@app.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+
+    conn = get_db_connection()
+
+    user = conn.execute(
+        """
+        SELECT id
+        FROM users
+        WHERE reset_token = ?
+        AND reset_token_expiry > ?
+        """,
+        (
+            token,
+            datetime.now()
+        )
+    ).fetchone()
+
+    if not user:
+        conn.close()
+        return "Invalid or expired reset link."
+
+    if request.method == "POST":
+
+        new_password = request.form.get("password", "")
+        confirm_password = request.form.get(
+            "confirm_password",
+            ""
+        )
+
+        if len(new_password) < 6:
+            conn.close()
+            return "Password must be at least 6 characters."
+
+        if new_password != confirm_password:
+            conn.close()
+            return "Passwords do not match."
+
+        hashed_password = generate_password_hash(
+            new_password
+        )
+
+        conn.execute(
+            """
+            UPDATE users
+            SET
+                password = ?,
+                reset_token = NULL,
+                reset_token_expiry = NULL
+            WHERE id = ?
+            """,
+            (
+                hashed_password,
+                user["id"]
+            )
+        )
+
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for("login"))
+
+    conn.close()
+
+    return render_template(
+        "reset_password.html",
+        token=token
+    )
+    conn = get_db_connection()
+
+    user = conn.execute(
+        """
+        SELECT id
+        FROM users
+        WHERE reset_token = ?
+        AND reset_token_expiry > ?
+        """,
+        (
+            token,
+            datetime.now()
+        )
+    ).fetchone()
+
+    if not user:
+
+        conn.close()
+
+        return "Invalid or expired reset link."
+
+    if request.method == "POST":
+
+        new_password = request.form["password"]
+
+        hashed_password = generate_password_hash(
+            new_password
+        )
+
+        conn.execute(
+            """
+            UPDATE users
+            SET
+                password = ?,
+                reset_token = NULL,
+                reset_token_expiry = NULL
+            WHERE id = ?
+            """,
+            (
+                hashed_password,
+                user["id"]
+            )
+        )
+
+        conn.commit()
+        conn.close()
+
+        return redirect(url_for("login"))
+
+    conn.close()
+
+    return render_template(
+        "reset_password.html",
+        token=token
+    )
 
 @app.route("/logout")
 def logout():
