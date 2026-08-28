@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <div class="page-header">
+        <h1>🔔 Notifications</h1>
+        <p>Stay updated about your waste reports and collection.</p>
+    </div>
+
+    {% if notifications %}
+
+        <div class="notifications-list">
+
+            {% for notification in notifications %}
+
+            <div class="notification-card
+                {% if notification['is_read'] == 0 %}
+                    unread
+                {% endif %}
+            ">
+
+                <div class="notification-icon">
+                    🔔
+                </div>
+
+                <div class="notification-content">
+
+                    <p>
+                        {{ notification["message"] }}
+                    </p>
+
+                    <small>
+                        🕒 {{ notification["created_at"]|ist }}
+                    </small>
+
+                </div>
+
+                {% if notification["is_read"] == 0 %}
+
+                    <span class="new-badge">
+                        NEW
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="no-reports">
+
+            <div class="no-reports-icon">
+                🔔
+            </div>
+
+            <h2>No Notifications</h2>
+
+            <p>
+                You don't have any notifications yet.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

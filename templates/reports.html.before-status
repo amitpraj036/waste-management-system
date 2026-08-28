@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}
+Waste Reports - WasteCare
+{% endblock %}
+
+{% block content %}
+
+<section class="reports-section">
+
+    <div class="reports-container">
+
+        <div class="reports-header">
+
+            <p class="tagline">♻️ Waste Management Dashboard</p>
+
+            <h1>Waste Reports</h1>
+
+            <p>
+                View and monitor reported waste problems.
+            </p>
+
+        </div>
+
+
+        {% if reports %}
+
+        <div class="reports-grid">
+
+            {% for report in reports %}
+
+            <div class="report-card">
+
+                {% if report["image"] %}
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename='uploads/' + report['image']
+                    ) }}"
+                    alt="Waste Image"
+                    class="report-image"
+                >
+
+                {% else %}
+
+                <div class="no-image">
+                    🗑️
+                    <p>No image uploaded</p>
+                </div>
+
+                {% endif %}
+
+
+                <div class="report-content">
+
+                    <span class="status">
+                        {{ report["status"] }}
+                    </span>
+
+                    <h2>
+                        {{ report["category"] }}
+                    </h2>
+
+                    <p>
+                        <strong>📍 Location:</strong>
+                        {{ report["location"] }}
+                    </p>
+{% if report["latitude"] and report["longitude"] %}
+
+<p>
+    <strong>🌐 Coordinates:</strong>
+    {{ "%.6f"|format(report["latitude"]) }},
+    {{ "%.6f"|format(report["longitude"]) }}
+</p>
+
+<a
+    href="https://www.google.com/maps?q={{ report['latitude'] }},{{ report['longitude'] }}"
+    target="_blank"
+    class="map-btn"
+>
+    🗺️ Open Location on Map
+</a>
+
+{% endif %}
+
+                    <p>
+                        <strong>📝 Description:</strong>
+                        {{ report["description"] }}
+                    </p>
+
+                    <p class="report-date">
+                        Reported:
+                        {{ report["created_at"]|ist }}
+                    </p>
+
+<form
+
+{% if report["collector_name"] %}
+
+<div class="collection-details">
+
+    <h3>
+        🚛 Collection Details
+    </h3>
+
+    <p>
+        <strong>Collector:</strong>
+        {{ report["collector_name"] }}
+    </p>
+
+    <p>
+        <strong>Pickup Date:</strong>
+        {{ report["pickup_date"] }}
+    </p>
+
+    <p>
+        <strong>Pickup Time:</strong>
+        {{ report["pickup_time"] }}
+    </p>
+
+    {% if report["collection_notes"] %}
+
+    <p>
+        <strong>Notes:</strong>
+        {{ report["collection_notes"] }}
+    </p>
+
+    {% endif %}
+
+</div>
+
+{% endif %}
+    action="{{ url_for('update_status', report_id=report['id']) }}"
+    method="POST"
+    class="status-form"
+>
+
+    <label for="status-{{ report['id'] }}">
+        Update Status
+    </label>
+
+    <select
+        id="status-{{ report['id'] }}"
+        name="status"
+    >
+
+        <option
+            value="Pending"
+            {% if report["status"] == "Pending" %}selected{% endif %}
+        >
+            Pending
+        </option>
+
+        <option
+            value="In Progress"
+            {% if report["status"] == "In Progress" %}selected{% endif %}
+        >
+            In Progress
+        </option>
+
+        <option
+            value="Collected"
+            {% if report["status"] == "Collected" %}selected{% endif %}
+        >
+            Collected
+        </option>
+
+    </select>
+
+    <button type="submit">
+        Update Status
+    </button>
+
+</form>
+{% if report["status"] != "Collected" %}
+
+<div class="collection-box">
+
+    <h3>
+        🚛 Schedule Waste Collection
+    </h3>
+
+    <form
+        action="{{ url_for(
+            'schedule_collection',
+            report_id=report['id']
+        ) }}"
+        method="POST"
+        class="collection-form"
+    >
+
+        <label>
+            Collector Name
+        </label>
+
+        <input
+            type="text"
+            name="collector_name"
+            placeholder="Enter collector name"
+            required
+        >
+
+
+        <label>
+            Pickup Date
+        </label>
+
+        <input
+            type="date"
+            name="pickup_date"
+            required
+        >
+
+
+        <label>
+            Pickup Time
+        </label>
+
+        <input
+            type="time"
+            name="pickup_time"
+            required
+        >
+
+
+        <label>
+            Collection Notes
+        </label>
+
+        <textarea
+            name="collection_notes"
+            rows="3"
+            placeholder="Any special instructions..."
+        ></textarea>
+
+
+        <button type="submit">
+            🚛 Schedule Collection
+        </button>
+
+    </form>
+
+</div>
+
+{% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="no-reports">
+
+            <h2>📭 No Reports Yet</h2>
+
+            <p>
+                There are currently no waste reports.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

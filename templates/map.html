@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}
+Waste Map - WasteCare
+{% endblock %}
+
+{% block content %}
+
+<section class="map-section">
+
+    <div class="map-container">
+
+        <div class="map-header">
+
+            <p class="tagline">
+                📍 Waste Management Locations
+            </p>
+
+            <h1>
+                Waste Report Map
+            </h1>
+
+            <p>
+                View reported waste locations on the map.
+            </p>
+
+        </div>
+
+        <div id="waste-map"></div>
+
+    </div>
+
+</section>
+
+
+<!-- Leaflet CSS -->
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+
+<!-- Leaflet JS -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+<script>
+
+    const reports = [
+        {% for report in reports %}
+
+        {
+            id: {{ report["id"] }},
+            category: {{ report["category"]|tojson }},
+            location: {{ report["location"]|tojson }},
+            latitude: {{ report["latitude"] }},
+            longitude: {{ report["longitude"] }},
+            status: {{ report["status"]|tojson }}
+        }
+
+        {% if not loop.last %},{% endif %}
+
+        {% endfor %}
+    ];
+
+
+    let map;
+
+
+    if (reports.length > 0) {
+
+        map = L.map("waste-map").setView(
+            [
+                reports[0].latitude,
+                reports[0].longitude
+            ],
+            13
+        );
+
+    } else {
+
+        map = L.map("waste-map").setView(
+            [26.9124, 75.7873],
+            10
+        );
+
+    }
+
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            attribution:
+                "&copy; OpenStreetMap contributors"
+        }
+    ).addTo(map);
+
+
+    reports.forEach(function(report) {
+
+        const marker = L.marker(
+            [
+                report.latitude,
+                report.longitude
+            ]
+        ).addTo(map);
+
+
+        marker.bindPopup(
+            `
+            <strong>♻️ ${report.category}</strong>
+            <br><br>
+
+            📍 ${report.location}
+            <br>
+
+            📊 Status:
+            ${report.status}
+            `
+        );
+
+    });
+
+</script>
+
+{% endblock %}

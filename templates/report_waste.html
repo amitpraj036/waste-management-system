@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}
+Report Waste - WasteCare
+{% endblock %}
+
+{% block content %}
+
+<section class="report-section">
+
+    <div class="report-container">
+
+        <div class="report-header">
+
+            <p class="tagline">♻️ Help Keep Your Community Clean</p>
+
+            <h1>Report Waste</h1>
+
+            <p>
+                Found garbage, illegal dumping, or an unclean area?
+                Report it to help improve waste management.
+            </p>
+
+        </div>
+
+
+        <form
+            action="/report"
+            method="POST"
+            enctype="multipart/form-data"
+            class="report-form"
+        >
+
+            <!-- Waste Category -->
+
+            <div class="form-group">
+
+                <label for="category">
+                    Waste Category
+                </label>
+
+                <select
+                    id="category"
+                    name="category"
+                    required
+                >
+
+                    <option value="">
+                        Select waste category
+                    </option>
+
+                    <option value="Organic">
+                        🌱 Organic / Wet Waste
+                    </option>
+
+                    <option value="Recyclable">
+                        ♻️ Recyclable Waste
+                    </option>
+
+                    <option value="Plastic">
+                        🥤 Plastic Waste
+                    </option>
+
+                    <option value="E-Waste">
+                        💻 E-Waste
+                    </option>
+
+                    <option value="Hazardous">
+                        ☣️ Hazardous Waste
+                    </option>
+
+                    <option value="Other">
+                        🗑️ Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Location -->
+
+            <div class="form-group">
+
+                <label for="location">
+                    Waste Location
+                </label>
+
+                <input
+                    type="text"
+                    id="location"
+                    name="location"
+                    placeholder="Enter waste location"
+                    required
+                >
+
+<button
+    type="button"
+    class="location-btn"
+    onclick="getLocation()"
+>
+    📍 Use My Current Location
+</button>
+
+<p
+    id="location-status"
+    class="location-status"
+></p>
+
+<input
+    type="hidden"
+    id="latitude"
+    name="latitude"
+>
+
+<input
+    type="hidden"
+    id="longitude"
+    name="longitude"
+>
+            </div>
+
+
+            <!-- Description -->
+
+            <div class="form-group">
+
+                <label for="description">
+                    Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    rows="5"
+                    placeholder="Describe the waste problem..."
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <!-- Image -->
+
+            <div class="form-group">
+
+                <label for="image">
+                    Upload Waste Photo
+                </label>
+
+                <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept="image/*"
+                >
+
+                <small>
+                    Upload a clear photo of the waste area.
+                </small>
+
+            </div>
+
+
+            <!-- Submit -->
+
+            <button
+                type="submit"
+                class="submit-btn"
+            >
+                Submit Waste Report
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

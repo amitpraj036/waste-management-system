@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="auth-container">
+
+    <div class="auth-box">
+
+        <div class="auth-icon">
+            🔐
+        </div>
+
+        <h1>Welcome Back!</h1>
+
+        <p>Login to manage your waste reports</p>
+
+        <form method="POST">
+
+            <label>
+                📧 Email Address
+            </label>
+
+            <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+            >
+
+            <label>
+                🔑 Password
+            </label>
+
+            <div class="password-field">
+
+    <input
+        type="password"
+        name="password"
+        id="loginPassword"
+        placeholder="Enter your password"
+        required
+    >
+
+    <button
+        type="button"
+        class="password-toggle"
+        onclick="togglePassword('loginPassword', this)"
+        aria-label="Show password"
+    >
+        👁️
+    </button>
+
+</div>
+
+<div class="forgot-password">
+
+    <a href="{{ url_for('forgot_password') }}">
+        Forgot Password?
+    </a>
+
+</div>
+            <button type="submit">
+                🔐 Login
+            </button>
+
+        </form>
+
+        <p class="auth-link">
+            New to Waste Management?
+            <a href="{{ url_for('register') }}">
+                Create Account
+            </a>
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+<script>
+function togglePassword(inputId, button) {
+
+    const input = document.getElementById(inputId);
+
+    if (!input) return;
+
+    if (input.type === "password") {
+
+        input.type = "text";
+        button.textContent = "🙈";
+        button.setAttribute("aria-label", "Hide password");
+
+    } else {
+
+        input.type = "password";
+        button.textContent = "👁️";
+        button.setAttribute("aria-label", "Show password");
+
+    }
+}
+</script>

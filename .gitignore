@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+*.pyc
+waste_management.db
+static/uploads/
+.env
